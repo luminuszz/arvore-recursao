@@ -1,11 +1,12 @@
-import gui.MainWindow;
-import javax.swing.SwingUtilities;
+import adapter.HttpAdapter;
 
 public class Main {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            MainWindow window = new MainWindow();
-            window.setVisible(true);
-        });
+        try {
+            int port = 8081;
+            HttpAdapter.startServer(port);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

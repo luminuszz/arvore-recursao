@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Calculadora & Visualizador de Árvore de Recursão</title>
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#c0c1ff",
+            "secondary": "#4cd7f6",
+            "tertiary": "#4edea3",
+            "surface": "#0f131d",
+            "surface-container": "#1c1f2a",
+            "surface-container-low": "#171b26",
+            "outline-variant": "#464554",
+            "on-surface": "#dfe2f1",
+            "on-surface-variant": "#c7c4d7",
+          }
+        }
+      }
+    }
+</script>
+<style>
+    .math-canvas-bg {
+      background-color: #0b0f19;
+      background-image: radial-gradient(rgba(70, 69, 84, 0.35) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f131d; }
+    ::-webkit-scrollbar-thumb { background: #313540; border-radius: 3px; }
+</style>
+</head>
+<body class="bg-surface text-on-surface flex flex-col h-screen overflow-hidden antialiased">
+<header class="flex justify-between items-center w-full px-6 h-14 z-50 border-b border-outline-variant bg-surface shrink-0">
+  <div class="text-xl font-bold">Árvore de Recursão</div>
+  <div class="flex items-center gap-2">
+    <span class="text-sm text-on-surface-variant uppercase tracking-wider">Algoritmo:</span>
+    <select class="bg-surface-container-low border border-outline-variant text-secondary text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary cursor-pointer" id="preset-selector">
+      <option selected value="mergesort">Merge Sort: T(n) = 2T(n/2) + O(n)</option>
+      <option value="binarysearch">Busca Binária: T(n) = T(n/2) + O(1)</option>
+      <option value="strassen">Strassen: T(n) = 7T(n/2) + O(n²)</option>
+      <option value="karatsuba">Karatsuba: T(n) = 3T(n/2) + O(n)</option>
+    </select>
+  </div>
+</header>
+<main class="flex-1 flex overflow-hidden">
+  <section class="w-[320px] bg-surface-container-low border-r border-outline-variant flex flex-col shrink-0 overflow-y-auto z-10">
+    <div class="p-5 border-b border-outline-variant bg-surface-container space-y-3">
+      <h2 class="font-bold text-lg text-on-surface">Definição da Recorrência</h2>
+      <div class="p-3.5 rounded-lg bg-surface-container-lowest border border-outline-variant flex flex-col items-center justify-center shadow-inner">
+        <div class="text-lg tracking-wide text-on-surface">
+          <span class="text-primary font-semibold">T(n)</span> =
+          <span class="text-secondary font-bold" id="formula-a">2</span> ·
+          <span class="text-on-surface">T(n / </span><span class="text-secondary font-bold" id="formula-b">2</span><span class="text-on-surface">)</span> +
+          <span class="text-tertiary font-bold" id="formula-fn">Θ(n)</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="p-5 space-y-4">
+      <div class="space-y-1.5">
+        <label class="text-sm text-on-surface-variant">Ramificação <strong class="text-secondary">a</strong></label>
+        <input class="w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-secondary outline-none focus:border-primary" id="input-param-a" type="number" min="1" value="2"/>
+      </div>
+      
+      <div class="space-y-1.5">
+        <label class="text-sm text-on-surface-variant">Fator Divisão <strong class="text-secondary">b</strong></label>
+        <input class="w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-secondary outline-none focus:border-primary" id="input-param-b" type="number" min="2" value="2"/>
+      </div>
+      
+      <div class="space-y-1.5">
+        <label class="text-sm text-on-surface-variant">Constante <strong class="text-tertiary">c</strong></label>
+        <input class="w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-secondary outline-none focus:border-primary" id="input-param-c" type="number" step="0.1" min="0" value="1"/>
+      </div>
+      
+      <div class="space-y-1.5">
+        <label class="text-sm text-on-surface-variant">Expoente <strong class="text-tertiary">k</strong></label>
+        <input class="w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-secondary outline-none focus:border-primary" id="input-param-k" type="number" step="0.1" min="0" value="1"/>
+      </div>
+      
+      <div class="space-y-1.5">
+        <label class="text-sm text-on-surface-variant flex justify-between">
+          <span>Tamanho da Entrada (<strong class="text-primary">n</strong>)</span>
+          <span id="slider-n-val" class="font-bold text-primary">16</span>
+        </label>
+        <input class="w-full h-1.5 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary" id="input-range-n" max="64" min="4" step="4" type="range" value="16"/>
+      </div>
+      
+      <button class="w-full py-2.5 px-4 rounded-lg bg-primary text-surface font-bold mt-4" id="btn-recalculate">
+        Gerar Árvore
+      </button>
+    </div>
+  </section>
+  <section class="flex-1 flex flex-col relative overflow-hidden math-canvas-bg">
+    <div class="absolute top-4 right-4 z-20 flex bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden shadow-lg">
+      <button class="px-3 py-1.5 hover:bg-surface-container text-on-surface border-r border-outline-variant transition-colors" id="btn-zoom-out" title="Diminuir Zoom">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+      </button>
+      <button class="px-3 py-1.5 font-bold text-sm text-secondary w-16 text-center border-r border-outline-variant hover:bg-surface-container transition-colors" id="btn-zoom-reset" title="Restaurar Zoom">
+        100%
+      </button>
+      <button class="px-3 py-1.5 hover:bg-surface-container text-on-surface transition-colors" id="btn-zoom-in" title="Aumentar Zoom">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+      </button>
+    </div>
+    <div class="flex-1 overflow-auto relative p-8" id="tree-canvas-viewport">
+      <div class="flex justify-center items-start min-w-max min-h-max">
+        <canvas id="treeCanvas" width="3000" height="1500" class="block transition-all duration-200"></canvas>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputA = document.getElementById('input-param-a');
+      const inputB = document.getElementById('input-param-b');
+      const inputC = document.getElementById('input-param-c');
+      const inputK = document.getElementById('input-param-k');
+      const sliderN = document.getElementById('input-range-n');
+      const sliderNVal = document.getElementById('slider-n-val');
+      const btnRecalculate = document.getElementById('btn-recalculate');
+      const presetSelector = document.getElementById('preset-selector');
+      const formulaA = document.getElementById('formula-a');
+      const formulaB = document.getElementById('formula-b');
+      const formulaFn = document.getElementById('formula-fn');
+      const treeCanvasViewport = document.getElementById('tree-canvas-viewport');
+      const btnZoomIn = document.getElementById('btn-zoom-in');
+      const btnZoomOut = document.getElementById('btn-zoom-out');
+      const btnZoomReset = document.getElementById('btn-zoom-reset');
+      const treeCanvas = document.getElementById('treeCanvas');
+
+      let currentZoom = 1.0;
+
+      function updateZoom() {
+          treeCanvas.style.width = `${3000 * currentZoom}px`;
+          treeCanvas.style.height = `${1500 * currentZoom}px`;
+          btnZoomReset.textContent = `${Math.round(currentZoom * 100)}%`;
+      }
+
+      btnZoomIn.addEventListener('click', () => {
+          if (currentZoom < 3.0) {
+              currentZoom += 0.1;
+              updateZoom();
+          }
+      });
+
+      btnZoomOut.addEventListener('click', () => {
+          if (currentZoom > 0.2) {
+              currentZoom -= 0.1;
+              updateZoom();
+          }
+      });
+
+      btnZoomReset.addEventListener('click', () => {
+          currentZoom = 1.0;
+          updateZoom();
+      });
+
+      treeCanvasViewport.addEventListener('wheel', (e) => {
+          if (e.ctrlKey) {
+              e.preventDefault();
+              if (e.deltaY < 0 && currentZoom < 3.0) {
+                  currentZoom += 0.1;
+              } else if (e.deltaY > 0 && currentZoom > 0.2) {
+                  currentZoom -= 0.1;
+              }
+              updateZoom();
+          }
+      }, { passive: false });
+
+      const presets = {
+        'mergesort': { a: 2, b: 2, c: 1, k: 1, n: 16 },
+        'binarysearch': { a: 1, b: 2, c: 1, k: 0, n: 16 },
+        'strassen': { a: 7, b: 2, c: 1, k: 2, n: 16 },
+        'karatsuba': { a: 3, b: 2, c: 1, k: 1, n: 16 }
+      };
+
+      function updateFormula() {
+        formulaA.textContent = inputA.value;
+        formulaB.textContent = inputB.value;
+        sliderNVal.textContent = sliderN.value;
+        const k = parseFloat(inputK.value);
+        if (k === 0) formulaFn.textContent = 'Θ(1)';
+        else if (k === 1) formulaFn.textContent = 'Θ(n)';
+        else formulaFn.textContent = `Θ(n^${k})`;
+      }
+
+      function updateFieldsFromPreset() {
+        const config = presets[presetSelector.value];
+        if (config) {
+          inputA.value = config.a;
+          inputB.value = config.b;
+          inputC.value = config.c;
+          inputK.value = config.k;
+          sliderN.value = config.n;
+          updateFormula();
+          triggerCompute();
+        }
+      }
+
+      presetSelector.addEventListener('change', updateFieldsFromPreset);
+
+      [inputA, inputB, inputC, inputK, sliderN].forEach(input => {
+        input.addEventListener('input', updateFormula);
+      });
+
+      const triggerCompute = async () => {
+        updateFormula();
+        const originalText = btnRecalculate.innerText;
+        btnRecalculate.innerText = "Gerando...";
+        
+        try {
+            const url = `/api/solve?quantidadeDeSubproblemas=${inputA.value}&divisorDoTamanhoDoSubproblema=${inputB.value}&constanteDeTrabalho=${inputC.value}&expoenteDoPolinomioDeTrabalho=${inputK.value}&tamanhoInicialDoProblema=${sliderN.value}`;
+            const response = await fetch(url);
+            const dados = await response.json();
+            
+            if (dados.error) {
+                alert('Erro: ' + dados.error);
+            } else {
+                renderizarArvore(dados.raiz);
+            }
+        } catch (err) {
+            alert('Falha ao conectar no servidor.');
+        } finally {
+            btnRecalculate.innerText = originalText;
+        }
+      };
+
+      btnRecalculate.addEventListener('click', triggerCompute);
+
+      let currentAnimationId = null;
+
+      function renderizarArvore(raiz) {
+          const canvas = document.getElementById('treeCanvas');
+          const ctx = canvas.getContext('2d');
+          
+          if (currentAnimationId) cancelAnimationFrame(currentAnimationId);
+          if (!raiz) {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              return;
+          }
+
+          const elementos = [];
+          const padding = 100;
+          const W = canvas.width - padding * 2;
+          const fila = [{ no: raiz, x: canvas.width / 2, y: padding, larguraDisponivel: W }];
+
+          const raio = 35;
+          const espacoVertical = 120;
+          let ordem = 0;
+
+          while (fila.length > 0) {
+              const { no, x, y, larguraDisponivel } = fila.shift();
+              
+              elementos.push({
+                  tipo: 'no', x, y, raio, texto: `n=${no.tamanho.toFixed(1)}`, ordem: ordem++
+              });
+
+              const quantidadeFilhos = no.filhos ? no.filhos.length : 0;
+              if (quantidadeFilhos > 0) {
+                  const espacoPorFilho = larguraDisponivel / quantidadeFilhos;
+                  const inicioX = x - larguraDisponivel / 2 + espacoPorFilho / 2;
+                  for (let i = 0; i < quantidadeFilhos; i++) {
+                      const filhoX = inicioX + (i * espacoPorFilho);
+                      const filhoY = y + espacoVertical;
+                      
+                      elementos.push({
+                          tipo: 'aresta', x1: x, y1: y + raio, x2: filhoX, y2: filhoY - raio, ordem: ordem++
+                      });
+                      
+                      fila.push({ no: no.filhos[i], x: filhoX, y: filhoY, larguraDisponivel: espacoPorFilho });
+                  }
+              }
+          }
+
+          const totalTempo = 1200; 
+          const atrasoPorOrdem = Math.min(80, totalTempo / elementos.length);
+          const duracaoAnimacao = 350; 
+          
+          const startTimestamp = performance.now();
+
+          const easeOutBack = (x) => {
+              const c1 = 1.70158;
+              const c3 = c1 + 1;
+              return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+          };
+
+          const animate = (timestamp) => {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              let todosCompletos = true;
+
+              for (const el of elementos) {
+                  const tempoInicioEl = startTimestamp + (el.ordem * atrasoPorOrdem);
+                  
+                  if (timestamp < tempoInicioEl) {
+                      todosCompletos = false;
+                      continue;
+                  }
+
+                  let progresso = (timestamp - tempoInicioEl) / duracaoAnimacao;
+                  if (progresso < 1.0) todosCompletos = false;
+                  progresso = Math.min(1.0, progresso);
+
+                  if (el.tipo === 'aresta') {
+                      const prog = 1 - Math.pow(1 - progresso, 3); // Cubic ease-out
+                      const atualX = el.x1 + (el.x2 - el.x1) * prog;
+                      const atualY = el.y1 + (el.y2 - el.y1) * prog;
+                      
+                      ctx.beginPath();
+                      ctx.moveTo(el.x1, el.y1);
+                      ctx.lineTo(atualX, atualY);
+                      ctx.strokeStyle = '#464554';
+                      ctx.lineWidth = 2;
+                      ctx.stroke();
+                  } else if (el.tipo === 'no') {
+                      const raioAtual = Math.max(0.1, el.raio * easeOutBack(progresso));
+                      
+                      ctx.beginPath();
+                      ctx.arc(el.x, el.y, Math.abs(raioAtual), 0, 2 * Math.PI);
+                      ctx.fillStyle = '#0f131d';
+                      ctx.fill();
+                      ctx.lineWidth = 2;
+                      ctx.strokeStyle = '#c0c1ff';
+                      ctx.stroke();
+
+                      if (progresso > 0.4) {
+                          const opacidade = Math.min(1.0, (progresso - 0.4) / 0.6);
+                          ctx.fillStyle = `rgba(223, 226, 241, ${opacidade})`;
+                          ctx.font = 'bold 12px monospace';
+                          ctx.textAlign = 'center';
+                          ctx.textBaseline = 'middle';
+                          ctx.fillText(el.texto, el.x, el.y);
+                      }
+                  }
+              }
+
+              if (!todosCompletos) {
+                  currentAnimationId = requestAnimationFrame(animate);
+              }
+          };
+          currentAnimationId = requestAnimationFrame(animate);
+      }
+      
+      updateFormula();
+      triggerCompute();
+    });
+</script>
+</body>
+</html>
