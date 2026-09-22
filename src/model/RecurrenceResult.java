@@ -14,6 +14,6 @@ public class RecurrenceResult {
     }
 
     public TreeNode getRoot() { return root; }
-    public Map<Integer, Double> getLevelCosts() { return levelCosts; }
+    public Map<Integer, Double> getLevelCosts() { return java.util.Collections.unmodifiableMap(levelCosts); }
     public String getComplexity() { return complexity; }
 }

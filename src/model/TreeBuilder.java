@@ -6,6 +6,9 @@ import java.util.Map;
 public class TreeBuilder {
 
     public static RecurrenceResult buildTree(double n, int a, double b, double c, double k) {
+        if (a < 1 || b <= 1) {
+            throw new IllegalArgumentException();
+        }
         Map<Integer, Double> levelCosts = new HashMap<>();
         TreeNode root = generateNodes(n, a, b, c, k, 0, levelCosts);
         String complexity = calculateComplexity(a, b, k);
@@ -32,11 +35,11 @@ public class TreeBuilder {
         double epsilon = 0.0001;
         
         if (Math.abs(logBofA - k) < epsilon) {
-            return "O(n^" + String.format("%.2f", k) + " * log(n))";
+            return "O(n^" + String.format(java.util.Locale.US, "%.2f", k) + " * log(n))";
         } else if (logBofA > k) {
-            return "O(n^" + String.format("%.2f", logBofA) + ")";
+            return "O(n^" + String.format(java.util.Locale.US, "%.2f", logBofA) + ")";
         } else {
-            return "O(n^" + String.format("%.2f", k) + ")";
+            return "O(n^" + String.format(java.util.Locale.US, "%.2f", k) + ")";
         }
     }
 }
