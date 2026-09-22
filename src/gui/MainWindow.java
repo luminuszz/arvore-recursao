@@ -13,6 +13,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JOptionPane;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainWindow extends JFrame {
@@ -79,7 +80,7 @@ public class MainWindow extends JFrame {
             
             sb.append("Custos por Nivel:\n");
             for (Map.Entry<Integer, Double> entry : result.getLevelCosts().entrySet()) {
-                sb.append("Nivel ").append(entry.getKey()).append(": ").append(String.format("%.2f", entry.getValue())).append("\n");
+                sb.append("Nivel ").append(entry.getKey()).append(": ").append(String.format(Locale.US, "%.2f", entry.getValue())).append("\n");
             }
             
             sb.append("\nComplexidade Assintotica:\n");
@@ -87,8 +88,8 @@ public class MainWindow extends JFrame {
             
             resultArea.setText(sb.toString());
             
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Por favor, insira valores numericos validos.");
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, "Entrada invalida: certifique-se de que a >= 1 e b > 1. (Use valores numericos validos)");
         }
     }
 }
