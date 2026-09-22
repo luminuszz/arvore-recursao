@@ -6,7 +6,7 @@ import java.util.Map;
 public class TreeBuilder {
 
     public static RecurrenceResult buildTree(double n, int a, double b, double c, double k) {
-        if (a < 1 || b <= 1) {
+        if (a < 1 || b <= 1 || n <= 0) {
             throw new IllegalArgumentException();
         }
         Map<Integer, Double> levelCosts = new HashMap<>();

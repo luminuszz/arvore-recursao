@@ -88,8 +88,10 @@ public class MainWindow extends JFrame {
             
             resultArea.setText(sb.toString());
             
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Formato numerico invalido. Use valores numericos validos.");
         } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, "Entrada invalida: certifique-se de que a >= 1 e b > 1. (Use valores numericos validos)");
+            JOptionPane.showMessageDialog(this, "Entrada invalida: certifique-se de que a >= 1, b > 1 e n > 0.");
         }
     }
 }

@@ -9,7 +9,7 @@ public class RecurrenceResult {
 
     public RecurrenceResult(TreeNode root, Map<Integer, Double> levelCosts, String complexity) {
         this.root = root;
-        this.levelCosts = levelCosts;
+        this.levelCosts = new java.util.HashMap<>(levelCosts);
         this.complexity = complexity;
     }
 

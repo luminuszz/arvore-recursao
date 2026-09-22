@@ -27,6 +27,6 @@ public class TreeNode {
     }
 
     public List<TreeNode> getChildren() {
-        return children;
+        return java.util.Collections.unmodifiableList(children);
     }
 }
