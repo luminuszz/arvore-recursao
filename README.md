@@ -1,6 +1,10 @@
 # Visualizador de Arvore de Recursao
 
-Este projeto resolve relacoes de recorrencia gerando uma arvore visual. Ele calcula o custo de algoritmos de divisao e conquista (como Merge Sort ou Strassen) e desenha cada etapa do particionamento no navegador.
+Este projeto resolve relacoes de recorrencia gerando uma arvore visual. Ele calcula o custo de algoritmos de divisao e conquista (como Merge Sort ou Strassen) e desenha cada etapa do particionamento.
+
+O projeto tem duas formas de uso:
+- **Arquivo unico (terminal):** `ArvoreDeRecursao.java` na raiz do projeto. Compila e roda sem dependencias. Imprime a arvore em ASCII no terminal.
+- **Versao web (opcional):** servidor HTTP + frontend com Canvas animado. Requer rodar o `run.sh` e abrir o navegador.
 
 O codigo fonte nao possui comentarios por restricao do desafio original. Os nomes das variaveis e classes explicam o comportamento.
 
@@ -540,6 +544,17 @@ Parametros: a=3, b=2, k=1
 ---
 
 ## Como executar
+
+### Arquivo unico (para entrega)
+
+```bash
+javac ArvoreDeRecursao.java
+java ArvoreDeRecursao
+```
+
+O programa pede os parametros pelo terminal e imprime a arvore, os custos por nivel e a complexidade.
+
+### Versao web (opcional)
 
 ```bash
 chmod +x run.sh
