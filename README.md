@@ -25,6 +25,38 @@ Um servidor HTTP nativo construído com a biblioteca embutida do Java (com.sun.n
 ### 5. Frontend e Animação
 O frontend na pasta src/web consome a API e desenha a estrutura em um elemento canvas. Para dar a percepção de crescimento da árvore, a renderização utiliza um algoritmo de Busca em Largura (BFS). O javascript lista todos os nós e arestas em ordem de nível e dispara a animação usando requestAnimationFrame. O espaço horizontal da tela é sempre dividido igualmente pela quantidade de filhos de cada galho. Isso impede que os círculos ultrapassem as margens laterais da tela quando a árvore cresce.
 
+## Exemplos de Execução Prática
+
+Para entender como a matemática se traduz no código, considere a fórmula geral de recorrência:
+`T(n) = a * T(n / b) + O(n^k)`
+
+O sistema recebe esses valores através dos seguintes parâmetros na classe `TreeBuilder`:
+- `quantidadeDeSubproblemas` (representa o `a`)
+- `divisorDoTamanhoDoSubproblema` (representa o `b`)
+- `expoenteDoPolinomioDeTrabalho` (representa o `k`)
+- `tamanhoInicialDoProblema` (representa o `n` inicial)
+
+### Exemplo 1: Merge Sort
+O Merge Sort divide um array na metade e resolve as duas metades recursivamente. Seu custo de junção é linear.
+- **Fórmula:** `T(n) = 2T(n/2) + O(n)`
+- **Parâmetros no sistema:** `quantidade = 2`, `divisor = 2`, `expoente = 1`.
+- **Comportamento no TreeBuilder:** A função `gerarNos` cria um nó raiz. O laço de repetição roda `2` vezes (pois `a=2`). Em cada volta, repassa o tamanho do problema atual dividido por `2`.
+- **Complexidade Resultante:** O logaritmo na base 2 de 2 é igual a 1. Como `k` também é 1, cai na regra de empate do Teorema Mestre. O sistema retorna `O(n^1.00 * log(n))`.
+
+### Exemplo 2: Busca Binária
+A Busca Binária divide o problema na metade, mas só precisa explorar uma delas. O custo por etapa é constante.
+- **Fórmula:** `T(n) = 1T(n/2) + O(1)`
+- **Parâmetros no sistema:** `quantidade = 1`, `divisor = 2`, `expoente = 0`.
+- **Comportamento no TreeBuilder:** O laço repete apenas `1` vez, gerando uma árvore que parece uma linha reta reta para baixo. O tamanho cai pela metade em cada nível.
+- **Complexidade Resultante:** Logaritmo na base 2 de 1 é 0. O expoente `k` também é 0. Cai na regra de empate. O sistema retorna `O(n^0.00 * log(n))`, que representa a classe Logarítmica padrão.
+
+### Exemplo 3: Algoritmo de Strassen (Multiplicação de Matrizes)
+O algoritmo de Strassen quebra as matrizes em blocos menores (dividindo o tamanho por 2), mas executa 7 multiplicações recursivas em vez das tradicionais 8.
+- **Fórmula:** `T(n) = 7T(n/2) + O(n^2)`
+- **Parâmetros no sistema:** `quantidade = 7`, `divisor = 2`, `expoente = 2`.
+- **Comportamento no TreeBuilder:** O nó raiz gera `7` filhos de uma só vez. A árvore explode exponencialmente de largura. Uma entrada inicial `n=64` atinge o nível 6 da árvore, gerando mais de 100.000 nós no total. É aqui que entra o limitador de 1000 nós do sistema, barrando o processamento excessivo.
+- **Complexidade Resultante:** Logaritmo base 2 de 7 é aproximadamente `2.81`. Como `2.81` é maior que o expoente local `2`, a complexidade cai no terceiro caso do Teorema Mestre. O sistema retorna `O(n^2.81)`.
+
 ## Como executar
 
 1. Dê permissão ao arquivo de script:
