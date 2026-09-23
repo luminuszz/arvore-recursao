@@ -118,9 +118,9 @@ Para um Merge Sort com `n=4`, essa funcao produz algo como:
 
 ---
 
-### 2. TreeBuilder (o motor matematico)
+### 2. TreeBuilder (construcao da arvore)
 
-Esta classe faz o trabalho pesado. Ela recebe os parametros da formula, constroi a arvore recursivamente e calcula a complexidade pelo Teorema Mestre.
+Esta classe recebe os parametros da formula, constroi a arvore recursivamente e calcula a complexidade pelo Teorema Mestre.
 
 > **Arquivo:** [`TreeBuilder.java`](src/model/TreeBuilder.java)
 
@@ -161,7 +161,7 @@ public static RecurrenceResult construirArvore(
 }
 ```
 
-O `contadorDeNos` usa um array de um elemento (`int[]`) em vez de um `int` simples. Isso e necessario porque variaveis primitivas em Java sao passadas por valor; um array permite que a funcao recursiva incremente o mesmo contador em todas as chamadas.
+O `contadorDeNos` usa um array de um elemento (`int[]`) em vez de um `int` simples. Variaveis primitivas em Java sao passadas por valor, entao um `int` comum nao funcionaria aqui. O array permite que todas as chamadas recursivas incrementem o mesmo contador.
 
 #### Geracao recursiva dos nos
 
@@ -275,9 +275,9 @@ A comparacao usa uma tolerancia de `0.0001` em vez de `==` direto porque numeros
 
 ---
 
-### 3. RecurrenceResult (o empacotador)
+### 3. RecurrenceResult (o resultado)
 
-Agrupa os tres pedacos do resultado em um unico objeto: a raiz da arvore, o mapa de custos por nivel, e a string de complexidade.
+Junta a raiz da arvore, o mapa de custos por nivel e a string de complexidade em um unico objeto que o `HttpAdapter` serializa para JSON.
 
 > **Arquivo:** [`RecurrenceResult.java`](src/model/RecurrenceResult.java)
 
@@ -310,7 +310,7 @@ public Map<Integer, Double> getCustosPorNivel() {
 
 ### 4. HttpAdapter (o servidor)
 
-Um servidor HTTP construido com a biblioteca nativa do Java (`com.sun.net.httpserver`). Nenhum framework externo e usado.
+Um servidor HTTP construido com `com.sun.net.httpserver`, que ja vem embutido no JDK.
 
 > **Arquivo:** [`HttpAdapter.java`](src/adapter/HttpAdapter.java)
 
@@ -354,7 +354,7 @@ RecurrenceResult resultado = TreeBuilder.construirArvore(
 String respostaJson = resultado.toJson();
 ```
 
-Se qualquer erro ocorrer (parametros invalidos, arvore grande demais), o catch generico devolve um JSON de erro com status 400:
+Se a chamada falhar, o catch devolve um JSON de erro com status 400:
 
 ```java
 } catch (Exception e) {
@@ -395,7 +395,7 @@ const triggerCompute = async () => {
 
 ### Montagem dos elementos (BFS)
 
-A funcao `renderizarArvore` percorre a arvore em Busca em Largura (BFS), listando todos os nos e arestas antes de desenhar qualquer coisa. Cada elemento recebe um numero de ordem que controla quando ele aparece na animacao:
+Antes de desenhar, `renderizarArvore` percorre a arvore inteira em BFS e coleta todos os nos e arestas numa lista. Cada elemento recebe um numero de ordem que define quando ele aparece na animacao:
 
 ```javascript
 const fila = [{
@@ -439,7 +439,7 @@ while (fila.length > 0) {
 }
 ```
 
-O espaco horizontal e dividido igualmente pela quantidade de filhos (`larguraDisponivel / quantidadeFilhos`). Isso garante que nenhum no saia fora dos limites do canvas, mesmo com arvores de 7 ramos como Strassen.
+O espaco horizontal e dividido igualmente pela quantidade de filhos (`larguraDisponivel / quantidadeFilhos`). Sem isso, arvores com muitos ramos (como Strassen, com 7 filhos por no) jogam nos para fora da area visivel.
 
 ### Loop de animacao
 
@@ -485,7 +485,7 @@ const animate = (timestamp) => {
 currentAnimationId = requestAnimationFrame(animate);
 ```
 
-O tempo total da animacao se adapta ao tamanho da arvore. Uma arvore pequena tem transicoes mais lentas. Uma arvore grande comprime os atrasos para que tudo termine em cerca de 1.2 segundos.
+O atraso entre elementos varia conforme o total de nos: arvores pequenas animam devagar, arvores grandes comprimem os atrasos para caber em cerca de 1.2 segundos.
 
 ---
 
@@ -574,4 +574,4 @@ java -cp bin test.TreeNodeTest
 java -cp bin test.TreeBuilderTest
 ```
 
-Se tudo estiver correto, cada comando imprime uma mensagem de sucesso no terminal.
+Se passar, a saida e `TreeNodeTest: TODOS OS TESTES PASSARAM.` e `TreeBuilderTest: TODOS OS TESTES PASSARAM.` respectivamente.
