@@ -30,6 +30,23 @@ class TreeNode {
     List<TreeNode> getFilhos() {
         return filhos;
     }
+
+    String toJson() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("\"tamanho\":").append(tamanho).append(",");
+        sb.append("\"custo\":").append(custo).append(",");
+        sb.append("\"filhos\":[");
+        for (int i = 0; i < filhos.size(); i++) {
+            sb.append(filhos.get(i).toJson());
+            if (i < filhos.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        sb.append("}");
+        return sb.toString();
+    }
 }
 
 class RecurrenceResult {
@@ -62,8 +79,8 @@ class TreeBuilder {
     }
 
     private static TreeNode gerarNos(double tamanhoAtualDoProblema, int quantidadeDeSubproblemas, double divisorDoTamanhoDoSubproblema, double constanteDeTrabalho, double expoenteDoPolinomioDeTrabalho, int nivelDeProfundidadeDaArvore, Map<Integer, Double> custosPorNivelDaArvore, int[] contadorDeNos) {
-        if (contadorDeNos[0] > 1000) {
-            throw new RuntimeException("A arvore gerou mais de 1000 nos! Reduza os parametros.");
+        if (contadorDeNos[0] > 5000) {
+            throw new RuntimeException("A arvore gerou mais de 5000 nos! Reduza os parametros.");
         }
         contadorDeNos[0]++;
         double custoDeTrabalhoDoNo = constanteDeTrabalho * Math.pow(tamanhoAtualDoProblema, expoenteDoPolinomioDeTrabalho);
