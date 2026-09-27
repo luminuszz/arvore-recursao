@@ -42,9 +42,6 @@ public class TreeBuilderTest {
     }
     
     private static void testaStrassen() {
-        // T(n) = 7T(n/2) + O(n^2)
-        // a=7, b=2, c=1, k=2
-        // log_2(7) ≈ 2.8 > 2 -> O(n^2.81)
         RecurrenceResult resultado = TreeBuilder.construirArvore(16, 7, 2, 1, 2);
         TreeNode raiz = resultado.getRaiz();
         
@@ -58,9 +55,6 @@ public class TreeBuilderTest {
     }
 
     private static void testaKaratsuba() {
-        // T(n) = 3T(n/2) + O(n)
-        // a=3, b=2, c=1, k=1
-        // log_2(3) ≈ 1.58 > 1 -> O(n^1.58)
         RecurrenceResult resultado = TreeBuilder.construirArvore(16, 3, 2, 1, 1);
         TreeNode raiz = resultado.getRaiz();
         
@@ -78,14 +72,12 @@ public class TreeBuilderTest {
             TreeBuilder.construirArvore(16, 0, 2, 1, 1);
             throw new RuntimeException("Deveria ter lancado excecao por quantidade de subproblemas invalida");
         } catch (IllegalArgumentException e) {
-            // Sucesso esperado
         }
         
         try {
             TreeBuilder.construirArvore(16, 2, 1, 1, 1);
             throw new RuntimeException("Deveria ter lancado excecao por divisor de tamanho invalido");
         } catch (IllegalArgumentException e) {
-            // Sucesso esperado
         }
     }
 }
