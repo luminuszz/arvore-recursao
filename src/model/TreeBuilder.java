@@ -17,8 +17,8 @@ public class TreeBuilder {
     }
 
     private static TreeNode gerarNos(double tamanhoAtualDoProblema, int quantidadeDeSubproblemas, double divisorDoTamanhoDoSubproblema, double constanteDeTrabalho, double expoenteDoPolinomioDeTrabalho, int nivelDeProfundidadeDaArvore, Map<Integer, Double> custosPorNivelDaArvore, int[] contadorDeNos) {
-        if (contadorDeNos[0] > 1000) {
-            throw new RuntimeException("A árvore gerou mais de 1000 nós! Reduza os parâmetros para não travar o visualizador.");
+        if (contadorDeNos[0] > 5000) {
+            throw new RuntimeException("A árvore gerou mais de 5000 nós! Reduza os parâmetros para não travar o visualizador.");
         }
         contadorDeNos[0]++;
         double custoDeTrabalhoDoNo = constanteDeTrabalho * Math.pow(tamanhoAtualDoProblema, expoenteDoPolinomioDeTrabalho);
